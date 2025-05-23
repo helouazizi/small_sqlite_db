@@ -49,11 +49,11 @@ int main(/*int argc, char *argv[]*/)
             printf("Executed.\n");
             break;
         case EXECUTE_TABLE_FULL:
-            printf("Error: Table full.\n");
+            printf(" Error: Table full.\n");
             break;
         case EXECUTE_UNRECOGNIZED_STATEMENT:
-            printf("Error: UNRECOGNIZED STATEMENT \n");
+            printf(" Error: UNRECOGNIZED STATEMENT\n");
             break;
-        };
+        }
     }
 }
