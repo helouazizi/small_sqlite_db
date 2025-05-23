@@ -28,7 +28,6 @@ typedef enum
 
 // ============================ //
 #define PAGE_SIZE 4096 // or whatever constant you use
-// #define ROW_SIZE 293   // must be known at compile time
 #define ROWS_PER_PAGE (PAGE_SIZE / ROW_SIZE)
 #define TABLE_MAX_PAGES 100
 #define TABLE_MAX_ROWS (ROWS_PER_PAGE * TABLE_MAX_PAGES)
