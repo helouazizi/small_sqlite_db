@@ -4,6 +4,7 @@
 
 int main(/*int argc, char *argv[]*/)
 {
+    Table *table = new_table();
     Buffer_input *input_buffer = create_input_buffer();
     while (1)
     {
@@ -11,33 +12,30 @@ int main(/*int argc, char *argv[]*/)
         read_input(input_buffer);
         if (strcmp(input_buffer->buffer, ".exit") == 0)
         {
-            close_input(input_buffer);
-            exit(EXIT_SUCCESS);
-        }
-        else
-            printf("Unrecognized command '%s'.\n", input_buffer->buffer);
-
-        //  here we are checkong do is the comand is the meta command
-        if (input_buffer->buffer[0] == '.')
-        {
-            switch (do_meta_command(input_buffer))
+            if (input_buffer->buffer[0] == '.')
             {
-            case (META_COMMAND_SUCCESS):
-                continue;
-            case (META_COMMAND_UNRECOGNIZED_COMMAND):
-                printf("Unrecognized command '%s'\n", input_buffer->buffer);
-                continue;
+                switch (do_meta_command(input_buffer, table))
+                {
+                case (META_COMMAND_SUCCESS):
+                    continue;
+                case (META_COMMAND_UNRECOGNIZED_COMMAND):
+                    printf("Unrecognized command '%s'\n", input_buffer->buffer);
+                    continue;
+                }
             }
         }
 
         // now lets prepare our statment
         Statement statement;
 
-        switch (prepare_stetment(input_buffer, &statement))
+        switch (prepare_statement(input_buffer, &statement))
         {
         case PREPARE_SUCCESS:
             break;
 
+        case PREPARE_SYNTAX_ERROR:
+            printf("Syntax error. Could not parse statement.\n");
+            continue;
         case PREPARE_UNRECOGNIZED_STATEMENT:
             printf("Unrecognized keyword at start of '%s'.\n",
                    input_buffer->buffer);
@@ -45,7 +43,14 @@ int main(/*int argc, char *argv[]*/)
         }
 
         // lets execute the statment
-        execute_statement(&statement);
-        printf("%s\n","Executed");
+        switch (execute_statement(&statement, table))
+        {
+        case EXECUTE_SUCCESS:
+            printf("Executed.\n");
+            break;
+        case EXECUTE_TABLE_FULL:
+            printf("Error: Table full.\n");
+            break;
+        };
     }
 }

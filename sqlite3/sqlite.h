@@ -8,8 +8,14 @@
 #define COLUMN_USERNAME_SIZE 32
 #define COLUMN_EMAIL_SIZE 255
 
+typedef enum
+{
+    EXECUTE_SUCCESS,
+    EXECUTE_TABLE_FULL
+} ExecuteResult;
+
 // ============================//
-#define size_of_attribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
+#define size_of_attribute(Struct, Attribute) sizeof(((Struct *)0)->Attribute)
 
 #define ID_SIZE size_of_attribute(Row, id)
 #define USERNAME_SIZE size_of_attribute(Row, username)
@@ -20,6 +26,18 @@
 #define EMAIL_OFFSET (USERNAME_OFFSET + USERNAME_SIZE)
 #define ROW_SIZE (ID_SIZE + USERNAME_SIZE + EMAIL_SIZE)
 
+// ============================ //
+#define PAGE_SIZE 4096 // or whatever constant you use
+// #define ROW_SIZE 293   // must be known at compile time
+#define ROWS_PER_PAGE (PAGE_SIZE / ROW_SIZE)
+#define TABLE_MAX_PAGES 100
+#define TABLE_MAX_ROWS (ROWS_PER_PAGE * TABLE_MAX_PAGES)
+
+typedef struct
+{
+    uint32_t num_rows;
+    void *pages[TABLE_MAX_PAGES];
+} Table;
 
 // ============================//
 typedef struct
@@ -39,8 +57,18 @@ typedef enum
 typedef enum
 {
     PREPARE_SUCCESS,
-    PREPARE_UNRECOGNIZED_STATEMENT
+    PREPARE_UNRECOGNIZED_STATEMENT,
+    PREPARE_SYNTAX_ERROR
 } PrepareResult;
+
+// ============================== //
+typedef struct
+{
+    int32_t id;
+    char username[COLUMN_USERNAME_SIZE];
+    char email[COLUMN_EMAIL_SIZE];
+
+}Row;
 
 // ============================//
 typedef enum
@@ -52,27 +80,30 @@ typedef enum
 typedef struct
 {
     StatementType type;
-    Row Row_to_insert;
+    Row row_to_insert; // only used by insert statement
 } Statement;
 
-// ============================== //
-typedef struct
-{
-    int32_t id;
-    char username[COLUMN_USERNAME_SIZE];
-    char email[COLUMN_EMAIL_SIZE]
 
-} Row;
 
 // ============================== //
 Buffer_input *create_input_buffer();
 void print_promt();
+void print_row(Row* row) ;
 void read_input(Buffer_input *input_buffer);
-void close_input(Buffer_input *input_buffer);
+void close_input_buffer(Buffer_input *input_buffer);
 
 // ================================ //
-MetaComandResult do_meta_command(Buffer_input *input_buffer);
-PrepareResult prepare_stetment(Buffer_input *input_buffer, Statement *stetment);
-void execute_statement(Statement *statement);
+MetaComandResult do_meta_command(Buffer_input* input_buffer, Table *table);
+PrepareResult prepare_statement(Buffer_input *input_buffer, Statement *statement);
+ExecuteResult execute_statement(Statement *statement, Table *table);
+
+void serialize_row(Row *source, void *destination);
+void deserialize_row(void *source, Row *destination);
+void *row_slot(Table *table, uint32_t row_num);
+ExecuteResult execute_insert(Statement *statement, Table *table);
+ExecuteResult execute_select(Statement *statement, Table *table);
+Table *new_table();
+void free_table(Table *table);
+
 
 #endif // SQLITE_H
