@@ -13,8 +13,9 @@ Buffer_input *create_input_buffer()
 }
 
 void print_promt() { printf("%s", "db >"); }
-void print_row(Row* row) {
-  printf("(%d, %s, %s)\n", row->id, row->username, row->email);
+void print_row(Row *row)
+{
+    printf("(%d, %s, %s)\n", row->id, row->username, row->email);
 }
 void read_input(Buffer_input *input_buffer)
 {
@@ -79,7 +80,9 @@ ExecuteResult execute_statement(Statement *statement, Table *table)
     case (STATEMENT_INSERT):
         return execute_insert(statement, table);
     case (STATEMENT_SELECT):
-        return execute_select(statement, table);
+        return execute_select( table);
+    default:
+        return EXECUTE_UNRECOGNIZED_STATEMENT;
     }
 }
 
@@ -127,7 +130,7 @@ ExecuteResult execute_insert(Statement *statement, Table *table)
     return EXECUTE_SUCCESS;
 }
 
-ExecuteResult execute_select(Statement *statement, Table *table)
+ExecuteResult execute_select( Table *table)
 {
     Row row;
     for (uint32_t i = 0; i < table->num_rows; i++)

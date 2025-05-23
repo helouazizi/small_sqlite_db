@@ -11,12 +11,12 @@
 typedef enum
 {
     EXECUTE_SUCCESS,
-    EXECUTE_TABLE_FULL
+    EXECUTE_TABLE_FULL,
+    EXECUTE_UNRECOGNIZED_STATEMENT,
 } ExecuteResult;
 
 // ============================//
 #define size_of_attribute(Struct, Attribute) sizeof(((Struct *)0)->Attribute)
-
 #define ID_SIZE size_of_attribute(Row, id)
 #define USERNAME_SIZE size_of_attribute(Row, username)
 #define EMAIL_SIZE size_of_attribute(Row, email)
@@ -101,7 +101,7 @@ void serialize_row(Row *source, void *destination);
 void deserialize_row(void *source, Row *destination);
 void *row_slot(Table *table, uint32_t row_num);
 ExecuteResult execute_insert(Statement *statement, Table *table);
-ExecuteResult execute_select(Statement *statement, Table *table);
+ExecuteResult execute_select(Table *table);
 Table *new_table();
 void free_table(Table *table);
 

@@ -1,7 +1,10 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -std=c99 -D_POSIX_C_SOURCE=200809L -Wall -Wextra 
 TARGET = sqlite
 OBJS = main.o sqlite.o
+
+
+
 
 all: $(TARGET)
 
