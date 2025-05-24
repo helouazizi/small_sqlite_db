@@ -57,6 +57,8 @@ typedef enum
 {
     PREPARE_SUCCESS,
     PREPARE_UNRECOGNIZED_STATEMENT,
+    PREPARE_STRING_TOO_LONG,
+    PREPARE_NEGATIVE_ID,
     PREPARE_SYNTAX_ERROR
 } PrepareResult;
 
@@ -64,10 +66,10 @@ typedef enum
 typedef struct
 {
     int32_t id;
-    char username[COLUMN_USERNAME_SIZE];
+    char username[COLUMN_USERNAME_SIZE ];
     char email[COLUMN_EMAIL_SIZE];
 
-}Row;
+} Row;
 
 // ============================//
 typedef enum
@@ -82,17 +84,16 @@ typedef struct
     Row row_to_insert; // only used by insert statement
 } Statement;
 
-
-
 // ============================== //
 Buffer_input *create_input_buffer();
 void print_promt();
-void print_row(Row* row) ;
+void print_row(Row *row);
 void read_input(Buffer_input *input_buffer);
 void close_input_buffer(Buffer_input *input_buffer);
 
 // ================================ //
-MetaComandResult do_meta_command(Buffer_input* input_buffer, Table *table);
+MetaComandResult do_meta_command(Buffer_input *input_buffer, Table *table);
+PrepareResult prepare_insert(Buffer_input *input_buffer , Statement *statement);
 PrepareResult prepare_statement(Buffer_input *input_buffer, Statement *statement);
 ExecuteResult execute_statement(Statement *statement, Table *table);
 
@@ -103,6 +104,5 @@ ExecuteResult execute_insert(Statement *statement, Table *table);
 ExecuteResult execute_select(Table *table);
 Table *new_table();
 void free_table(Table *table);
-
 
 #endif // SQLITE_H

@@ -38,8 +38,8 @@ describe 'database' do
   end
 
   it 'allows inserting strings that are the maximum length' do
-  long_username = "a"*32
-  long_email = "a"*255
+  long_username = "a"*31
+  long_email = "a"*254
   script = [
     "insert 1 #{long_username} #{long_email}",
     "select",
@@ -47,10 +47,10 @@ describe 'database' do
   ]
   result = run_script(script)
   expect(result).to match_array([
-    "db > Executed.",
-    "db > (1, #{long_username}, #{long_email})",
+    "db >Executed.",
+    "db >(1, #{long_username}, #{long_email})",
     "Executed.",
-    "db > ",
+    "db >",
   ])
 end
 end

@@ -51,19 +51,41 @@ MetaComandResult do_meta_command(Buffer_input *input_buffer, Table *table)
         return META_COMMAND_UNRECOGNIZED_COMMAND;
     }
 }
+
+PrepareResult prepare_insert(Buffer_input *input_buffer , Statement *statement){
+    statement->type = STATEMENT_INSERT;
+    char *key_word = strtok(input_buffer->buffer," ");
+    char *id_str = strtok(NULL," ");
+    char *user_name = strtok(NULL," ");
+    char *user_email = strtok(NULL," ");
+
+    if (id_str == NULL || user_name == NULL || user_email == NULL){
+        return PREPARE_SYNTAX_ERROR;
+    }
+
+    int id = atoi(id_str);
+    if (id < 0 ){
+        return PREPARE_NEGATIVE_ID;
+    }
+    if (strlen(user_name)> USERNAME_SIZE){
+        return PREPARE_STRING_TOO_LONG;
+    }
+    if (strlen(user_email)> EMAIL_SIZE)
+    {
+        return PREPARE_STRING_TOO_LONG;
+    }
+    
+    statement->row_to_insert.id = id;
+    strcpy(statement->row_to_insert.username ,user_name);
+    strcpy(statement->row_to_insert.email,user_email);
+    return PREPARE_SUCCESS;
+}
+
 PrepareResult prepare_statement(Buffer_input *input_buffer, Statement *statement)
 {
     if (strncmp(input_buffer->buffer, "insert", 6) == 0)
     {
-        statement->type = STATEMENT_INSERT;
-        int args_assigned = sscanf(
-            input_buffer->buffer, "insert %d %s %s", &(statement->row_to_insert.id),
-            statement->row_to_insert.username, statement->row_to_insert.email);
-        if (args_assigned < 3)
-        {
-            return PREPARE_SYNTAX_ERROR;
-        }
-        return PREPARE_SUCCESS;
+        return prepare_insert(input_buffer,statement);
     }
     if (strcmp(input_buffer->buffer, "select") == 0)
     {
@@ -73,6 +95,7 @@ PrepareResult prepare_statement(Buffer_input *input_buffer, Statement *statement
 
     return PREPARE_UNRECOGNIZED_STATEMENT;
 }
+
 ExecuteResult execute_statement(Statement *statement, Table *table)
 {
     switch (statement->type)
