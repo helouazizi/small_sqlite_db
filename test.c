@@ -6,7 +6,7 @@ unsigned long hash(const char *str){
 
     while ((c = *str++))
         hash = ((hash << 5) + hash) + c;
-
+// gjhgjkhj
     return hash;
 }
 
