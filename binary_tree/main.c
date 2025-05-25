@@ -48,26 +48,84 @@ void free_tree(Node *root)
     free_tree(root->right);
     free(root);
 }
-Node *search(Node *root, int data){
-    if (data < root->data){
-        if (data == root->data || root->left == NULL){
+Node *search(Node *root, int data)
+{
+    if (data < root->data)
+    {
+        if (data == root->data || root->left == NULL)
+        {
             return root;
         }
-        search(root->left,data);
+        search(root->left, data);
     }
-    if (data > root->data){
-        if (data == root->data || root->right == NULL){
+    if (data > root->data)
+    {
+        if (data == root->data || root->right == NULL)
+        {
             return root;
         }
-        search(root->right,data);
+        search(root->right, data);
     }
     return root;
 }
 
-void delete(Node *root,int data){
-    
+Node *findMin(Node *node)
+{
+    while (node && node->left != NULL)
+        node = node->left;
+    return node;
+}
+Node *findMax(Node *node)
+{
+    while (node && node->right != NULL)
+        node = node->right;
+    return node;
 }
 
+Node* delete(Node *root, int data)
+{
+    if (root == NULL)
+        return NULL;
+    if (data < root->data)
+    {
+        root->left = delete(root->left, data);
+    }
+    else if (data > root->data)
+    {
+        root->right = delete(root->right, data);
+    }
+    else
+    {
+        // found a node data == root.dta
+        if (root->left == NULL && root->right == NULL)
+        {
+            free(root);
+            return NULL;
+        }
+        else if (root->left == NULL)
+        {
+
+            Node *tem = root->right;
+            free(root);
+            return tem;
+        }
+        else if (root->right == NULL)
+        {
+            Node *tem = root->left;
+            free(root);
+            return tem;
+        }else
+        {
+            /* two tcheldern */
+            Node* successor = findMin(root->right);
+            root->data = successor->data;
+            root->right = delete(root->right, successor->data);
+        }
+        
+        
+    }
+    return root;
+}
 
 int main()
 {
@@ -93,6 +151,21 @@ int main()
     {
         printf("%s\n", "not found");
     }
+
+    Node *min = findMin(root->left);
+
+    printf(" the min value is %d\n", min->data);
+    Node *max = findMax(root->right);
+
+    printf(" the max value is %d\n", max->data);
+
+    Node *node = delete(root,7);
+    printf("deleted %d\n", node->data);
+
+
+    printf("Inorder traversal after deletation: ");
+    inorder(root); // should print sorted order
+    printf("\n");
 
     free_tree(root);
     return 0;
