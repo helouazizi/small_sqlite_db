@@ -1,22 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
+typedef struct Node
+{
     int data;
     struct Node *left;
     struct Node *right;
 } Node;
 
-void inorder(Node *root) {
-    if (root != NULL) {
+void inorder(Node *root)
+{
+    if (root != NULL)
+    {
         inorder(root->left);
         printf("%d ", root->data);
         inorder(root->right);
     }
 }
 
-
-Node *create_node(int data) {
+Node *create_node(int data)
+{
     Node *node = malloc(sizeof(Node));
     node->data = data;
     node->left = NULL;
@@ -24,8 +27,10 @@ Node *create_node(int data) {
     return node;
 }
 
-Node *insert(Node *root, int data) {
-    if (root == NULL) {
+Node *insert(Node *root, int data)
+{
+    if (root == NULL)
+    {
         return create_node(data);
     }
     if (data < root->data)
@@ -35,16 +40,37 @@ Node *insert(Node *root, int data) {
     return root;
 }
 
-void free_tree(Node *root) {
-    if (root == NULL) return;
+void free_tree(Node *root)
+{
+    if (root == NULL)
+        return;
     free_tree(root->left);
     free_tree(root->right);
     free(root);
 }
+Node *search(Node *root, int data){
+    if (data < root->data){
+        if (data == root->data || root->left == NULL){
+            return root;
+        }
+        search(root->left,data);
+    }
+    if (data > root->data){
+        if (data == root->data || root->right == NULL){
+            return root;
+        }
+        search(root->right,data);
+    }
+    return root;
+}
+
+void delete(Node *root,int data){
+    
+}
 
 
-
-int main() {
+int main()
+{
     Node *root = NULL;
     root = insert(root, 10);
     insert(root, 5);
@@ -55,8 +81,18 @@ int main() {
     insert(root, 18);
 
     printf("Inorder traversal: ");
-    inorder(root);  // should print sorted order
+    inorder(root); // should print sorted order
     printf("\n");
+
+    Node *serched = search(root, 58);
+    if (serched->data == 58)
+    {
+        printf("%s\n", "found");
+    }
+    else
+    {
+        printf("%s\n", "not found");
+    }
 
     free_tree(root);
     return 0;
