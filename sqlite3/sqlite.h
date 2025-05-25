@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/types.h> // For ssize_t
 #include <stdint.h>
+#include <stdbool.h>
 #define COLUMN_USERNAME_SIZE 32
 #define COLUMN_EMAIL_SIZE 255
 
@@ -33,19 +34,26 @@ typedef enum
 #define TABLE_MAX_ROWS (ROWS_PER_PAGE * TABLE_MAX_PAGES)
 
 
-typedef struct {
-  int file_descriptor;
-  uint32_t file_length;
-  void* pages[TABLE_MAX_PAGES];
+
+typedef struct
+{
+    int file_descriptor;
+    uint32_t file_length;
+    void *pages[TABLE_MAX_PAGES];
 } Pager;
 
 typedef struct
 {
     uint32_t num_rows;
-    Pager pager;
+    Pager *pager;
 } Table;
 
-
+typedef struct
+{
+    Table *table;
+    uint32_t *row_num;
+    bool end_of_table; // Indicates a position one past the last element
+} Cursor;
 
 // ============================//
 
@@ -76,7 +84,7 @@ typedef enum
 typedef struct
 {
     int32_t id;
-    char username[COLUMN_USERNAME_SIZE ];
+    char username[COLUMN_USERNAME_SIZE];
     char email[COLUMN_EMAIL_SIZE];
 
 } Row;
@@ -103,7 +111,7 @@ void close_input_buffer(Buffer_input *input_buffer);
 
 // ================================ //
 MetaComandResult do_meta_command(Buffer_input *input_buffer, Table *table);
-PrepareResult prepare_insert(Buffer_input *input_buffer , Statement *statement);
+PrepareResult prepare_insert(Buffer_input *input_buffer, Statement *statement);
 PrepareResult prepare_statement(Buffer_input *input_buffer, Statement *statement);
 ExecuteResult execute_statement(Statement *statement, Table *table);
 
@@ -112,7 +120,17 @@ void deserialize_row(void *source, Row *destination);
 void *row_slot(Table *table, uint32_t row_num);
 ExecuteResult execute_insert(Statement *statement, Table *table);
 ExecuteResult execute_select(Table *table);
-Table *new_table();
-void free_table(Table *table);
+void *get_page(Pager *pager, uint32_t page_num);
+Table *db_open(const char *filename);
+void db_close(Table *table);
+Pager *pager_open(const char *filename);
+void pager_flush(Pager *pager, uint32_t page_num, uint32_t size);
+// void free_table(Table *table);
+
+
+Cursor *table_end(Table *table);
+Cursor *table_start(Table *table);
+void *cursor_value(Cursor *cursor);
+void cursor_advance(Cursor *cursor);
 
 #endif // SQLITE_H

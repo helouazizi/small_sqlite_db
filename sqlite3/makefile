@@ -21,4 +21,4 @@ clean:
 	rm -f $(TARGET) *.o
 
 run: all
-	./$(TARGET)
+	./$(TARGET) $(DB)

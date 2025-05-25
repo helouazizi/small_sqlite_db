@@ -1,0 +1,10 @@
+🧠 Practice Ideas
+Add a search() function
+
+Implement delete() from a binary search tree
+
+Add preorder() and postorder() traversal
+
+Count total nodes
+
+Find height of the tree
